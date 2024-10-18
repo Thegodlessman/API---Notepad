@@ -110,3 +110,63 @@ export const createCategory = async (req: Request, res: Response): Promise<Respo
         });
     }
 }
+
+export const setFavorite = async (req: Request, res: Response): Promise< Response | any> => {
+    const { id } = req.params; 
+    try{
+        const note = await Note.findOne({
+            _id: id, owner: req.body.owner
+        })
+
+        if(!note){
+            return res.status(404).json({
+                msg: "Nota no encontrada"
+            })
+        }
+
+        if(note.favorite){
+            note.favorite = false
+        }else{
+            note.favorite = true
+        }
+
+        await note.save()
+
+        return res.status(200).json({
+            msg: "Nota actualizada",
+            note
+        })
+    }catch(error){
+        return res.status(500).json({
+            msg: "Error al actualizar",
+            error
+        })
+    }
+}
+
+export const showNotes = async (req: Request, res: Response): Promise< Response | any> => {
+    try{
+        const notes = await Note.find({
+            owner: req.body.owner
+        })
+
+        if(!notes){
+            return res.status(404).json({
+                message: "Notes not found",
+                status: 404,
+            });
+        }
+        return res.status(200).json({
+            message: "Notes found",
+            status: 200,
+            notes,
+        });
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            message: "Error showing notes",
+            status: 500,
+            error,
+        });
+    }
+}
