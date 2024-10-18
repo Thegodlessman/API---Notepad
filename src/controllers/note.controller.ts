@@ -170,3 +170,52 @@ export const showNotes = async (req: Request, res: Response): Promise< Response 
         });
     }
 }
+
+export const showCat = async (req: Request, res: Response): Promise< Response | any> => {
+    try{
+        const cat = await category.find({
+            owner: req.body.owner
+        })
+        if(!cat){
+            return res.status(404).json({
+                message: "Series not found",
+                status: 404,
+            });
+        }
+        return res.status(200).json({
+            message: "Series found",
+            status: 200,
+            cat,
+        });
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            message: "Error showing series",
+            status: 500,
+            error,
+        });
+    }
+}
+
+export const showFav = async (req: Request, res: Response): Promise< Response | any> => {
+    try{
+        const favNotes = await Note.find({owner: req.body.owner, favorite: true})
+
+        if(!favNotes){
+            return res.status(404).json({
+                msg: "Notas no encontradas"
+            })
+        }
+        return res.status(200).json({
+            msg: "Notas encontradas",
+            favNotes
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            message: "Error showing notes",
+            status: 500,
+            error,
+        });
+    }
+}
