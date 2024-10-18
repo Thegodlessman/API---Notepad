@@ -219,3 +219,36 @@ export const showFav = async (req: Request, res: Response): Promise< Response | 
         });
     }
 }
+
+export const deleteNote = async (req: Request, res: Response): Promise< Response | any> => {
+    try{
+        const {id} = req.params; 
+        const note = await Note.findOne({
+            _id: id,
+            owner: req.body.owner
+        })
+
+        if(!note){
+            return res.status(404).json({
+                message: "Note not found",
+                status: 404,
+            });
+        }
+
+        await Note.deleteOne({
+            _id: id,
+            owner: req.body.owner
+        }).exec();
+        return res.status(200).json({
+            msg: "Nota eliminada", 
+            note
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(500).json({
+            message: "Error deleting note",
+            status: 500,
+            error,
+        });
+    }
+}

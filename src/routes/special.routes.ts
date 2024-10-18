@@ -6,7 +6,8 @@ import {
     setFavorite,
     showNotes,
     showCat,
-    showFav
+    showFav,
+    deleteNote
 } from "../controllers/note.controller";
 
 const router = Router();
@@ -17,5 +18,6 @@ router.patch('/setFav/:id',  passport.authenticate('jwt', {session: false}), set
 router.get('/showFav', passport.authenticate('jwt', {session: false}), showFav)
 router.get('/showNotes', passport.authenticate('jwt', {session: false}), showNotes)
 router.get('/showCat',  passport.authenticate('jwt', {session: false}), showCat)
+router.delete('/deleteNote/:id', passport.authenticate('jwt', {session: false}), deleteNote)
 
 export default router
