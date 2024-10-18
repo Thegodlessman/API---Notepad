@@ -3,6 +3,7 @@ import Note from "../models/note"
 import user from "../models/user"
 import category from "../models/category"
 import {check, validationResult} from "express-validator"
+import mongoose from "mongoose"
 
 export const createNote = async (req: Request, res: Response): Promise<Response | any > => {
     await check("title")
@@ -252,3 +253,87 @@ export const deleteNote = async (req: Request, res: Response): Promise< Response
         });
     }
 }
+
+export const addNoteToCat = async (req: Request, res: Response): Promise<Response | any> => {
+    const { id } = req.params;
+    const { catId, owner } = req.body;
+
+    try {
+        // Buscar la categoría por su _id
+        const cat = await category.findById(catId);
+        if (!cat) {
+            return res.status(404).json({
+            msg: "Categoría no encontrada",
+            });
+        }
+      // Actualizar la nota y asociarla con la categoría
+        const note = await Note.findOneAndUpdate(
+            { _id: id, owner }, // Asegurarse de que la nota y el owner existan
+            { catId },          // Actualizamos la nota para asignarle la categoría
+            { new: true }       // Devolver la nota actualizada
+        );
+        if (!note) {
+            return res.status(404).json({
+            message: "Nota no encontrada",
+            status: 404,
+            });
+        }
+        // No es necesario llamar a save() después de findOneAndUpdate
+        return res.status(200).json({
+            message: "Nota agregada a la categoría",
+            status: 200,
+            note,
+        });
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            message: "Error al actualizar la nota",
+            status: 500,
+            error // Devolver el mensaje de error
+        });
+    }
+};
+
+export const showCatNotes = async (req: Request, res: Response): Promise<Response | any> => {
+  const { catId } = req.params;
+  const { owner } = req.body; // Asegúrate de que este campo esté presente en el body
+
+  try {
+    // Imprimir catId y owner para depuración
+    console.log("catId:", catId);
+    console.log("owner:", owner);
+
+    // Validar si catId es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(catId)) {
+      return res.status(400).json({
+        message: "Categoría inválida",
+        status: 400,
+      });
+    }
+
+    // Buscar notas por owner y catId
+    const notes = await Note.find({ owner, catId });
+
+    // Verificar si no se encontraron notas
+    if (notes.length === 0) {
+      return res.status(404).json({
+        message: "No se encontraron notas para esta categoría",
+        status: 404,
+      });
+    }
+
+    // Devolver las notas encontradas
+    return res.status(200).json({
+      message: "Notas encontradas",
+      status: 200,
+      notes,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Error al mostrar las notas",
+      status: 500,
+      error
+    });
+  }
+};
