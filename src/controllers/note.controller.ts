@@ -1,6 +1,5 @@
 import { Request, Response } from "express"
 import Note from "../models/note"
-import user from "../models/user"
 import category from "../models/category"
 import {check, validationResult} from "express-validator"
 import mongoose from "mongoose"
