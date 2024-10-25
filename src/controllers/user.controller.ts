@@ -6,6 +6,7 @@ import config from "../config/config"
 
 function createToken(user: IUser){
     return jwt.sign({
+        fullName: user.name + ' ' + user.lastName,
         id: user.id,
         email: user.email
     }, config.JWTSecret)
@@ -27,7 +28,6 @@ export const register = async (req: Request, res: Response): Promise<Response | 
 
     const newUser = new User(req.body)
     await newUser.save()
-
     return res.status(201).json(newUser)
 }
 
