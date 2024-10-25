@@ -18,7 +18,7 @@ router.post('/special', passport.authenticate('jwt', {session: false}), createNo
 router.post('/createCat', passport.authenticate('jwt', {session: false}), createCategory);
 router.patch('/setFav/:id',  passport.authenticate('jwt', {session: false}), setFavorite );
 router.get('/showFav', passport.authenticate('jwt', {session: false}), showFav);
-router.get('/showNotes', passport.authenticate('jwt', {session: false}), showNotes);
+router.post('/showNotes', passport.authenticate('jwt', {session: false}), showNotes);
 router.get('/showCat',  passport.authenticate('jwt', {session: false}), showCat);
 router.delete('/deleteNote/:id', passport.authenticate('jwt', {session: false}), deleteNote);
 router.patch('/addNote/:id', passport.authenticate('jwt', {session: false}), addNoteToCat);
