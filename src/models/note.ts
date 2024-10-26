@@ -24,7 +24,7 @@ const noteSchema = new Schema({
     },
     category:{
         type: String,
-        required: false
+        required: true
     },
     favorite: {
         type: Boolean,
