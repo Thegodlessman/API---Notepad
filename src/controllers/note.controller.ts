@@ -24,11 +24,11 @@ export const createNote = async (req: Request, res: Response): Promise<Response 
         })
     }
 
-    const {title, content, catId, owner} = req.body
+    const {title, content, categoryName, owner} = req.body
 
-    if(catId){
+    if(categoryName){
         const cat = await category.findOne({
-            name: catId
+            name: categoryName
         })
         if(!cat){
             return res.status(404).json({
@@ -41,10 +41,12 @@ export const createNote = async (req: Request, res: Response): Promise<Response 
     try{
         const trash = false
         const favorite = false
+    
+        
         const note = new Note({
             title,
             content,
-            catId,
+            categoryName,
             favorite,
             trash,
             owner
@@ -57,7 +59,7 @@ export const createNote = async (req: Request, res: Response): Promise<Response 
             note_info: {
                 title, 
                 content,
-                catId,
+                categoryName,
                 favorite,
                 trash, 
                 owner

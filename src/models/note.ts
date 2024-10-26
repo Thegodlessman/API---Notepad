@@ -4,7 +4,7 @@ export interface INote extends Document{
     title: string;
     content: string;
     owner: string;
-    category: string;
+    categoryName: string;
     favorite: boolean;
     trash: boolean;
 }
@@ -22,7 +22,7 @@ const noteSchema = new Schema({
         type: String,
         required: true
     },
-    category:{
+    categoryName:{
         type: String,
         required: true
     },
