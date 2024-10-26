@@ -7,61 +7,63 @@ import mongoose from "mongoose"
 export const createNote = async (req: Request, res: Response): Promise<Response | any > => {
     await check("title")
         .notEmpty()
-        .withMessage("Debe ingresar un título")
-        .isLength({ max: 200 })
-        .withMessage("El título es demasiado largo")
-        .run(req);
+        .withMessage("Debe ingresar un titulo")
+        .isLength({max: 200})
+        .withMessage("El titulo es demasiado largo")
+        .run(req)
     await check("content")
-        .isLength({ max: 240 })
+        .isLength({max: 240})
         .withMessage("La nota es demasiado larga")
-        .run(req);
-
+        .run(req)
+    
     let result = validationResult(req);
-    if (!result.isEmpty()) {
+    if(!result.isEmpty()){
         return res.status(400).json({
             msg: "Algo ha salido mal",
             errors: result.array()
-        });
+        })
     }
 
-    const { title, content, catId, owner } = req.body;
+    const {title, content, catId, owner} = req.body
 
-    if (catId) {
-        const cat = await category.findOne({ _id: catId });  // Asegúrate de que `catId` sea un `ObjectId`
-        if (!cat) {
+    if(catId){
+        const cat = await category.findOne({
+            name: catId
+        })
+        if(!cat){
             return res.status(404).json({
-                msg: "Categoría no encontrada",
+                msg: "categoria no encontrada",
                 status: 404
-            });
+            })
         }
     }
 
-    try {
-        const trash = false;
-        const favorite = false;
+    try{
+        const trash = false
+        const favorite = false
         const note = new Note({
             title,
             content,
-            category: catId,  // Cambiado `catId` a `category` si el modelo `Note` lo usa
+            catId,
             favorite,
             trash,
             owner
-        });
+        })
 
-        await note.save();
+        await note.save()
 
         return res.status(201).json({
             msg: "La nota ha sido creada",
             note_info: {
-                title,
+                title, 
                 content,
-                category: catId,  // Cambiado `catId` a `category`
+                catId,
                 favorite,
-                trash,
+                trash, 
                 owner
             }
-        });
-    } catch (error) {
+        })
+    }catch(error){
         console.log(error);
         return res.status(500).json({
             message: "Error creating note",
@@ -69,8 +71,7 @@ export const createNote = async (req: Request, res: Response): Promise<Response 
             error: error,
         });
     }
-};
-
+}
 
 export const createCategory = async (req: Request, res: Response): Promise<Response | any > =>{
     await check("name").notEmpty().withMessage("La categoria debe tener nombre").run(req);
