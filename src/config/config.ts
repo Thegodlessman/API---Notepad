@@ -1,7 +1,11 @@
+import dotenv from 'dotenv';
+
+dotenv.config()
+
 export default{
     JWTSecret: process.env.JWT_SECRET || 'secreto',
     DB: {
-        URI: 'mongodb+srv://thegodlessman:8TXqQS0NeBgtgxq9@cluster.z8qs0.mongodb.net/?retryWrites=true&w=majority&appName=Cluster', 
+        URI:  process.env.MONGODB_URI || '', 
         USER: process.env.MONGODB_USER  || '', 
         PASSWORD: process.env.MONGODB_PASSWORD || ''
     }
