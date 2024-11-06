@@ -6,6 +6,11 @@ import passportMiddleware from './middlewares/passport';
 
 import authRoutes from './routes/auth.routes'
 import specialRoutes from './routes/special.routes'
+import movieRoutes from './routes/movie.routes'
+
+import dotenv from 'dotenv';
+dotenv.config();
+
 
 const app = express();
 
@@ -24,5 +29,6 @@ app.get('/', (req, res) => {
 
 app.use(authRoutes);
 app.use(specialRoutes);
+app.use(movieRoutes)
 
 export default app;
