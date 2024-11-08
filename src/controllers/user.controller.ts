@@ -6,7 +6,7 @@ import config from "../config/config"
 import { body } from "express-validator"
 
 function createToken(user: IUser){
-    return jwt.sign({
+    return jwt.sign({   
         id: user.id,
         fullName: user.name + ' ' + user.lastName,
         username: user.username,
@@ -40,31 +40,27 @@ export const register = async (req: Request, res: Response): Promise<Response | 
 }
 
 export const login = async(req: Request, res: Response): Promise< Response | any > => {
-    if (!req.body.email || !req.body.password){
-        return res.status(400).json({
-            msg: 'Verifique que haya ingresado su correo y su contraseña'
-        })
-    }
+    const { loginValue, password } = req.body;
 
-    const user = await User.findOne({
-        email: req.body.email
-    })
-
-    if(!user){
-        return res.status(400).json({
-            msg: 'Este usuario no ha sido encontrado'
+    try {
+        // Busca al usuario en base a email o username
+        const user = await User.findOne({
+            $or: [{ email: loginValue }, { username: loginValue }]
         });
+
+        if (!user) {
+            return res.status(400).json({ msg: 'Usuario o email no encontrado' });
+        }
+
+        // Verifica la contraseña
+        const isMatch = await user.comparePassword(password);
+        if (isMatch) {
+            return res.status(200).json({
+                token: createToken(user)
+            })
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ msg: 'Error en el servidor' });
     }
-
-    const isMatch = await user.comparePassword(req.body.password)
-
-    if(isMatch){
-        return res.status(200).json({
-            token: createToken(user)
-        })
-    }
-
-    return res.status(400).json({
-        msg: "El correo o la contraseña son incorrectos"
-    })
 }
