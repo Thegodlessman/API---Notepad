@@ -3,26 +3,34 @@ import User, {IUser} from '../models/user'
 import jwt from 'jsonwebtoken'
 
 import config from "../config/config"
+import { body } from "express-validator"
 
 function createToken(user: IUser){
     return jwt.sign({
-        fullName: user.name + ' ' + user.lastName,
         id: user.id,
+        fullName: user.name + ' ' + user.lastName,
+        username: user.username,
         email: user.email
     }, config.JWTSecret)
 }
 
 export const register = async (req: Request, res: Response): Promise<Response | any  > => {
-    if (!req.body.email || !req.body.password){
+    if (!req.body.email || !req.body.password || !req.body.username || !req.body.name || !req.body.lastName){
         return res.status(400).json({
-            msg: 'Verifique que haya ingresado su correo y su contraseña'
+            msg: 'Debe rellenar todos los campos para registrarse satisfactoriamente'
         })
     }
 
-    const user = await User.findOne({email: req.body.email})
-    if(user){
+    const findMail = await User.findOne({email: req.body.email})
+    if(findMail){
         return res.status(400).json({
-            msg: "El usuario ya existe"
+            msg: "El correo electronico ya ha sido registrado"
+        })
+    }
+    const findUsername = await User.findOne({username: req.body.username})
+    if(findUsername){
+        return res.status(400).json({
+            msg: "El usuario ya ha sido registrado"
         })
     }
 
