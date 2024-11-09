@@ -31,3 +31,25 @@ export const getMovies = async (req: Request, res: Response): Promise<Response |
         return res.status(500).json({ message: 'Error al obtener las películas' });
     }
 };
+
+
+export const getMoviesByCategory = async (req: Request, res: Response): Promise<Response | any> => {
+    const { category } = req.params;  // Recibe la categoría como parámetro de URL
+    try {
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${category}`, {
+            params: {
+                api_key: apiKey,
+                language: 'es-ES',
+                page: 1,
+            },
+        });
+        return res.status(200).json({
+            message: `Películas de la categoría: ${category}`,
+            data: response.data.results,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Error al obtener películas por categoría",
+        });
+    }
+};
