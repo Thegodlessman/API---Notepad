@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 
 // Configuración de CORS
 app.use(cors({
-    origin: 'http://localhost:3000', // Reemplaza con la URL de tu frontend
+    origin: 'http://localhost:5173', // Reemplaza con la URL de tu frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
     optionsSuccessStatus: 204, // Código de éxito para OPTIONS
