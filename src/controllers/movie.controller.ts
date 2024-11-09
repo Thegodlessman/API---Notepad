@@ -53,3 +53,33 @@ export const getMoviesByCategory = async (req: Request, res: Response): Promise<
         });
     }
 };
+
+export const searchMovies = async (req: Request, res: Response): Promise<Response | any> => {
+    const { query } = req.query; // Se recibe el término de búsqueda como parámetro de consulta
+    if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: 'Se requiere un término de búsqueda válido.' });
+    }
+
+    try {
+        // Realizamos la búsqueda en TMDB usando el endpoint de búsqueda de películas
+        const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
+            params: {
+                api_key: apiKey,
+                language: 'es-ES',
+                query,
+                page: 1,
+            }
+        });
+
+        // Enviamos los resultados al frontend
+        return res.status(200).json({
+            success: true,
+            data: response.data.results,
+            total_pages: response.data.total_pages,
+            total_results: response.data.total_results,
+        });
+    } catch (error) {
+        console.error("Error al buscar películas:", error);
+        return res.status(500).json({ message: 'Error al buscar películas' });
+    }
+};
