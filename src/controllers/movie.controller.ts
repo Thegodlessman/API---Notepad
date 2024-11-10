@@ -102,7 +102,7 @@ export const detailsMovie = async (req: Request, res: Response): Promise<Respons
         res.setHeader('Cache-Control', 'no-store');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
-        return res.status(200).json({ data: movieDetails });
+        return res.status(200).json(movieDetails);
     } catch (error) {
         console.error('Error al obtener los detalles de la película:', error);
         return res.status(500).json({ message: 'Error al obtener los detalles de la película' });
