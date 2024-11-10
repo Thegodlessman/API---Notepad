@@ -83,3 +83,25 @@ export const searchMovies = async (req: Request, res: Response): Promise<Respons
         return res.status(500).json({ message: 'Error al buscar películas' });
     }
 };
+
+export const detailsMovie = async (req: Request, res: Response): Promise<Response | any> => {
+    const { id } = req.params;
+
+    try {
+        // Hacer la solicitud a TMDB para obtener los detalles de la película por ID
+        const response = await axios.get(`https://api.themoviedb.org/3/search/movie/${id}`, {
+            params: {
+                api_key: apiKey,
+                language: 'es-ES' // Ajusta el idioma según tus necesidades
+            }
+        });
+
+        const movieDetails = response.data;
+
+        // Enviar los detalles de la película al frontend
+        return res.status(200).json({ data: movieDetails });
+    } catch (error) {
+        console.error('Error al obtener los detalles de la película:', error);
+        return res.status(500).json({ message: 'Error al obtener los detalles de la película' });
+    }
+}
