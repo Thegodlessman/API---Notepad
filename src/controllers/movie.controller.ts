@@ -99,6 +99,9 @@ export const detailsMovie = async (req: Request, res: Response): Promise<Respons
         const movieDetails = response.data;
 
         // Enviar los detalles de la película al frontend
+        res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
         return res.status(200).json({ data: movieDetails });
     } catch (error) {
         console.error('Error al obtener los detalles de la película:', error);
