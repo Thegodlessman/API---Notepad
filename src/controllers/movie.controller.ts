@@ -111,16 +111,25 @@ export const detailsMovie = async (req: Request, res: Response): Promise<Respons
 };
 
 export const addFavorite = async (req: Request, res: Response): Promise<Response | any> => {
-    const {userId, movieId, listName} = req.body
+    const { userId, movieId, title, posterPath, releaseDate, voteAverage, genres } = req.body;
 
     try {
-        const favorite = new Favorite({ userId, movieId, listName });
+        const favorite = new Favorite({
+            userId,
+            movieId,
+            title,
+            posterPath,
+            releaseDate,
+            voteAverage,
+            genres,
+        });
         await favorite.save();
-        res.status(201).json({ message: 'Película guardada en favoritos.' });
+        return res.status(201).json({ message: 'Película guardada en favoritos.' });
     } catch (error) {
-        res.status(500).json({ message: 'Error al guardar la película.' });
+        return res.status(500).json({ message: 'Error al guardar la película.' });
     }
 };
+
 
 export const getFavorite = async (req: Request, res: Response): Promise<Response | any> => { 
     try {
