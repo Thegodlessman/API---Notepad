@@ -139,3 +139,19 @@ export const getFavorite = async (req: Request, res: Response): Promise<Response
         res.status(500).json({ message: 'Error al obtener los favoritos.' });
     }
 }
+
+export const removeFavorite = async (req: Request, res: Response): Promise<Response | any> => {
+    const { userId, movieId } = req.body;
+
+    try {
+        const result = await Favorite.findOneAndDelete({ userId, movieId });
+        
+        if (result) {
+            return res.status(200).json({ message: "Película eliminada de favoritos." });
+        } else {
+            return res.status(404).json({ message: "Película no encontrada en favoritos." });
+        }
+    } catch (error) {
+        return res.status(500).json({ message: "Error al eliminar la película de favoritos." });
+    }
+};
