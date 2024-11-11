@@ -1,6 +1,7 @@
 import axios from "axios";
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
+import Favorite from "../models/favorite";
 dotenv.config();
 
 const TMDB_API_URL = 'https://api.themoviedb.org/3/movie/popular';
@@ -108,3 +109,24 @@ export const detailsMovie = async (req: Request, res: Response): Promise<Respons
         return res.status(500).json({ message: 'Error al obtener los detalles de la película' });
     }
 };
+
+export const addFavorite = async (req: Request, res: Response): Promise<Response | any> => {
+    const {userId, movieId, listName} = req.body
+
+    try {
+        const favorite = new Favorite({ userId, movieId, listName });
+        await favorite.save();
+        res.status(201).json({ message: 'Película guardada en favoritos.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al guardar la película.' });
+    }
+};
+
+export const getFavorite = async (req: Request, res: Response): Promise<Response | any> => { 
+    try {
+        const favorites = await Favorite.find({ userId: req.params.userId });
+        res.status(200).json(favorites);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener los favoritos.' });
+    }
+}
