@@ -9,7 +9,7 @@ router.get('/movies/category/:category', getMoviesByCategory);
 router.get('/movies/search',searchMovies)
 router.get('/movies/:id', detailsMovie)
 router.post('/favorites', addFavorite);
-router.delete('/favorite', removeFavorite)
+router.delete('/favorites', removeFavorite)
 router.get('/favorites/:userId', getFavorite )
 
 export default router;
