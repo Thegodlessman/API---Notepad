@@ -21,5 +21,7 @@ router.get('/movies/:id', detailsMovie)
 router.post('/favorites', addFavorite);
 router.delete('/favorites', removeFavorite)
 router.get('/favorites/:userId', getFavorite )
+router.post('/comments', addComment);
+router.get('/comments/:movieId', getCommentsByMovie);
 
 export default router;
