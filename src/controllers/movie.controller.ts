@@ -2,6 +2,8 @@ import axios from "axios";
 import dotenv from 'dotenv';
 import { Request, Response } from 'express';
 import Favorite from "../models/favorite";
+import Comment from '../models/comment';
+
 dotenv.config();
 
 const TMDB_API_URL = 'https://api.themoviedb.org/3/movie/popular';
@@ -153,5 +155,47 @@ export const removeFavorite = async (req: Request, res: Response): Promise<Respo
         }
     } catch (error) {
         return res.status(500).json({ message: "Error al eliminar la película de favoritos." });
+    }
+};
+
+export const addComment = async (req: Request, res: Response): Promise<Response | any> => {
+    const { movieId, userId, comment, rating } = req.body;
+
+    if (!comment || comment.length > 240) {
+        return res.status(400).json({ message: 'El comentario debe tener un máximo de 240 caracteres.' });
+    }
+    if (rating < 1 || rating > 10) {
+        return res.status(400).json({ message: 'La valoración debe estar entre 1 y 10.' });
+    }
+
+    try {
+        // Guardamos el comentario y valoración
+        const newComment = new Comment({ movieId, userId, comment, rating });
+        await newComment.save();
+
+        // También agregamos la película a favoritos
+        const favoriteExists = await Favorite.findOne({ userId, movieId });
+        if (!favoriteExists) {
+            const newFavorite = new Favorite({ userId, movieId });
+            await newFavorite.save();
+        }
+
+        return res.status(201).json({ message: 'Comentario y valoración añadidos con éxito.' });
+    } catch (error) {
+        console.error("Error al añadir comentario:", error);
+        return res.status(500).json({ message: 'Error al añadir el comentario y valoración.' });
+    }
+};
+
+// Función para obtener comentarios de una película
+export const getCommentsByMovie = async (req: Request, res: Response): Promise<Response | any> => {
+    const { movieId } = req.params;
+
+    try {
+        const comments = await Comment.find({ movieId }).sort({ createdAt: -1 });  // Ordenamos por fecha, el más reciente primero
+        return res.status(200).json(comments);
+    } catch (error) {
+        console.error("Error al obtener comentarios:", error);
+        return res.status(500).json({ message: 'Error al obtener los comentarios de la película.' });
     }
 };

@@ -1,5 +1,15 @@
 import { Router, Request, Response } from 'express';
-import { detailsMovie, getMovies, getMoviesByCategory, searchMovies, addFavorite, getFavorite, removeFavorite} from '../controllers/movie.controller';
+import { 
+    detailsMovie, 
+    getMovies, 
+    getMoviesByCategory, 
+    searchMovies, 
+    addFavorite, 
+    getFavorite, 
+    removeFavorite,
+    addComment,
+    getCommentsByMovie
+} from '../controllers/movie.controller';
 import passport from "passport";
 
 const router = Router();
