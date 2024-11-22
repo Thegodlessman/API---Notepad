@@ -24,6 +24,6 @@ router.delete('/favorites', removeFavorite)
 router.get('/favorites/:userId', getFavorite)
 router.post('/comments', addComment);
 router.get('/comments/:movieId', getCommentsByMovie);
-router.delete('/comments/:movideId/:userId', deleteComment)
+router.delete('/comments/:movieId/:userId', deleteComment)
 
 export default router;
