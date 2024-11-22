@@ -59,7 +59,7 @@ export const getMoviesByCategory = async (req: Request, res: Response): Promise<
 };
 
 export const searchMovies = async (req: Request, res: Response): Promise<Response | any> => {
-    const { query, genre, release_year, vote_average } = req.query || '';
+    const { query, genre, release_year, vote_average } = req.query || ''; // Prueba
 
     if (!query || typeof query !== 'string') {
         return res.status(400).json({ message: 'Se requiere un término de búsqueda válido.' });
