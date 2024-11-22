@@ -59,20 +59,25 @@ export const getMoviesByCategory = async (req: Request, res: Response): Promise<
 };
 
 export const searchMovies = async (req: Request, res: Response): Promise<Response | any> => {
-    const { query } = req.query;
-    if (!query || typeof query !== 'string') {
-        return res.status(400).json({ message: 'Se requiere un término de búsqueda válido.' });
+    const { query, genre, release_year, vote_average } = req.query;
+
+    if (!query && !genre && !release_year && !vote_average) {
+        return res.status(400).json({ message: 'Se requiere al menos un criterio de búsqueda.' });
     }
 
     try {
-        const response = await axios.get('https://api.themoviedb.org/3/search/movie', {
+        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
             params: {
                 api_key: apiKey,
                 language: 'es-ES',
-                query,
+                query, // Título
+                with_genres: genre, // Género
+                primary_release_year: release_year, // Año de estreno
+                'vote_average.gte': vote_average, // Valoración mínima
                 page: 1,
-            }
+            },
         });
+
         return res.status(200).json({
             success: true,
             data: response.data.results,
@@ -83,6 +88,7 @@ export const searchMovies = async (req: Request, res: Response): Promise<Respons
         console.error("Error al buscar películas:", error);
         return res.status(500).json({ message: 'Error al buscar películas' });
     }
+
 };
 
 export const detailsMovie = async (req: Request, res: Response): Promise<Response | any> => {
@@ -125,7 +131,7 @@ export const addFavorite = async (req: Request, res: Response): Promise<Response
     }
 };
 
-export const getFavorite = async (req: Request, res: Response): Promise<Response | any> => { 
+export const getFavorite = async (req: Request, res: Response): Promise<Response | any> => {
     try {
         const favorites = await Favorite.find({ userId: req.params.userId });
         res.status(200).json(favorites);
@@ -139,7 +145,7 @@ export const removeFavorite = async (req: Request, res: Response): Promise<Respo
 
     try {
         const result = await Favorite.findOneAndDelete({ userId, movieId });
-        
+
         if (result) {
             return res.status(200).json({ message: "Película eliminada de favoritos." });
         } else {
