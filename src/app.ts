@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 
 // Configuración de CORS
 app.use(cors({
-    origin: 'http://localhost:5173', // Reemplaza con la URL de tu frontend
+    origin: '*', // Reemplaza con la URL de tu frontend
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
     optionsSuccessStatus: 204, // Código de éxito para OPTIONS
@@ -28,7 +28,7 @@ app.use(cors({
 
 // Respuesta manual para preflight requests (OPTIONS) en rutas específicas
 app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+    res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.sendStatus(204);
