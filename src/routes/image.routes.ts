@@ -31,7 +31,7 @@ router.post('/upload', upload.single('image'), (req, res) => {
         if (!imageUrl) {
             throw new Error('No se pudo obtener la URL de la imagen');
         }
-        res.json({ url: imageUrl });
+        res.json({ url: imageUrl }); // Devuelve la URL de la imagen
     } catch (error) {
         console.error('Error en /upload:', error); // Registro del error detallado
         res.status(500).json({ message: 'Error al subir la imagen', error });
