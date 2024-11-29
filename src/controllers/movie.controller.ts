@@ -61,22 +61,19 @@ export const getMoviesByCategory = async (req: Request, res: Response): Promise<
 export const searchMovies = async (req: Request, res: Response): Promise<Response | any> => {
     const { query, genre, release_year, vote_average } = req.query;
 
-    if (!query && !genre && !release_year && !vote_average) {
-        return res.status(400).json({ message: 'Se requiere al menos un criterio de búsqueda.' });
-    }
-
     try {
-        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', {
-            params: {
-                api_key: apiKey,
-                language: 'es-ES',
-                query, // Título
-                with_genres: genre, // Género
-                primary_release_year: release_year, // Año de estreno
-                'vote_average.gte': vote_average, // Valoración mínima
-                page: 1,
-            },
-        });
+        const params: any = {
+            api_key: apiKey,
+            language: 'es-ES',
+            page: 1,
+        };
+
+        if (query) params.query = query;
+        if (genre) params.with_genres = genre;
+        if (release_year) params.primary_release_year = release_year;
+        if (vote_average) params["vote_average.gte"] = vote_average;
+
+        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', { params });
 
         return res.status(200).json({
             success: true,
@@ -88,8 +85,8 @@ export const searchMovies = async (req: Request, res: Response): Promise<Respons
         console.error("Error al buscar películas:", error);
         return res.status(500).json({ message: 'Error al buscar películas' });
     }
-
 };
+
 
 export const detailsMovie = async (req: Request, res: Response): Promise<Response | any> => {
     const { id } = req.params;
