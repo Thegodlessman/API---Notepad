@@ -9,6 +9,17 @@ dotenv.config();
 const TMDB_API_URL = 'https://api.themoviedb.org/3/movie/popular';
 const apiKey = process.env.TMDB_API_KEY;
 
+interface Movie {
+    id: number;
+    title: string;
+    genre_ids: number[];
+    release_date: string;
+    vote_average: number;
+    overview: string;
+    poster_path?: string; // Opcional, porque puede estar ausente
+    [key: string]: any; // Por si hay propiedades adicionales no esperadas
+}
+
 if (!apiKey) {
     throw new Error("API Key no encontrada. Verifica tu archivo .env.");
 } else {
@@ -59,34 +70,59 @@ export const getMoviesByCategory = async (req: Request, res: Response): Promise<
 };
 
 export const searchMovies = async (req: Request, res: Response): Promise<Response | any> => {
-    const { query, genre, release_year, vote_average } = req.query;
-
     try {
-        const params: any = {
-            api_key: apiKey,
-            language: 'es-ES',
-            page: 1,
-        };
+        const genre = req.query.genre as string; // Aseguramos que es string
+        const release_year = req.query.release_year as string; // Aseguramos que es string
+        const vote_average = req.query.vote_average as string; // Aseguramos que es string
+        const query = req.query.query as string; // Aseguramos que es string
 
-        if (query) params.query = query;
-        if (genre) params.with_genres = genre;
-        if (release_year) params.primary_release_year = release_year;
-        if (vote_average) params["vote_average.gte"] = vote_average;
+        // Si hay una búsqueda por nombre, se llama al endpoint de búsqueda de TMDB
+        if (query) {
+            const searchResponse = await axios.get('https://api.themoviedb.org/3/search/movie', {
+                params: {
+                    api_key: process.env.TMDB_API_KEY,
+                    query,
+                },
+            });
 
-        const response = await axios.get('https://api.themoviedb.org/3/discover/movie', { params });
+            const searchResults: Movie[] = searchResponse.data.results;
 
-        return res.status(200).json({
-            success: true,
-            data: response.data.results,
-            total_pages: response.data.total_pages,
-            total_results: response.data.total_results,
+            // Filtrar los resultados de la búsqueda por los filtros adicionales si están presentes
+            const filteredResults = searchResults.filter((movie: Movie) => {
+                const matchesGenre = genre ? movie.genre_ids.includes(Number(genre)) : true;
+                const matchesYear = release_year ? movie.release_date.startsWith(release_year) : true;
+                const matchesVote = vote_average ? movie.vote_average >= Number(vote_average) : true;
+
+                return matchesGenre && matchesYear && matchesVote;
+            });
+
+            return res.status(200).json(filteredResults);
+        }
+
+        // Si no hay una búsqueda por nombre, obtener una lista general de películas populares
+        const response = await axios.get('https://api.themoviedb.org/3/movie/popular', {
+            params: {
+                api_key: process.env.TMDB_API_KEY,
+            },
         });
+
+        let movies: Movie[] = response.data.results;
+
+        // Filtrar las películas populares por los parámetros recibidos
+        movies = movies.filter((movie: Movie) => {
+            const matchesGenre = genre ? movie.genre_ids.includes(Number(genre)) : true;
+            const matchesYear = release_year ? movie.release_date.startsWith(release_year) : true;
+            const matchesVote = vote_average ? movie.vote_average >= Number(vote_average) : true;
+
+            return matchesGenre && matchesYear && matchesVote;
+        });
+
+        return res.status(200).json(movies);
     } catch (error) {
-        console.error("Error al buscar películas:", error);
-        return res.status(500).json({ message: 'Error al buscar películas' });
+        console.error('Error al obtener películas:', error);
+        return res.status(500).json({ error: 'Error al obtener las películas' });
     }
 };
-
 
 export const detailsMovie = async (req: Request, res: Response): Promise<Response | any> => {
     const { id } = req.params;
