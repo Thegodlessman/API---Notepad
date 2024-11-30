@@ -7,11 +7,11 @@ import { body } from "express-validator"
 
 function createToken(user: IUser) {
     return jwt.sign({
+        profileImage: user.profileImage,
         id: user.id,
         fullName: user.name + ' ' + user.lastName,
         username: user.username,
         email: user.email,
-        profileImage: user.profileImage //comentario
     }, config.JWTSecret)
 }
 
