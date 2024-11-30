@@ -9,7 +9,8 @@ import {
     removeFavorite,
     addComment,
     getCommentsByMovie,
-    deleteComment
+    deleteComment,
+    getMovieRating
 } from '../controllers/movie.controller';
 import passport from "passport";
 
@@ -24,6 +25,7 @@ router.delete('/favorites', removeFavorite)
 router.get('/favorites/:userId', getFavorite)
 router.post('/comments', addComment);
 router.get('/comments/:movieId', getCommentsByMovie);
+router.get('/movie/:movieId/average-rating', getMovieRating)
 router.delete('/comments/:movieId/:userId', deleteComment)
 
 export default router;

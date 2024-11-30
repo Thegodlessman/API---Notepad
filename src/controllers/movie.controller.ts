@@ -144,6 +144,29 @@ export const detailsMovie = async (req: Request, res: Response): Promise<Respons
     }
 };
 
+export const getMovieRating = async (req: Request, res: Response): Promise<Response | any> => {
+    try {
+        const { movieId } = req.params;
+
+        // Busca los comentarios de la película
+        const comments = await Comment.find({ movieId });
+
+        if (comments.length === 0) {
+            return res.status(200).json({ averageRating: 0 }); // Si no hay comentarios, la valoración es 0
+        }
+
+        // Calcula la valoración promedio
+        const totalRating = comments.reduce((sum, comment) => sum + comment.rating, 0);
+        const averageRating = totalRating / comments.length;
+
+        return res.status(200).json({ averageRating });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Error al obtener la valoración promedio" });
+    }
+};
+
+
 export const addFavorite = async (req: Request, res: Response): Promise<Response | any> => {
     const { userId, movieId, title, posterPath, releaseDate, voteAverage, genres } = req.body;
 
