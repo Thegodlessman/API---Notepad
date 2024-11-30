@@ -10,7 +10,8 @@ function createToken(user: IUser) {
         id: user.id,
         fullName: user.name + ' ' + user.lastName,
         username: user.username,
-        email: user.email
+        email: user.email,
+        profileImage: user.profileImage
     }, config.JWTSecret)
 }
 
