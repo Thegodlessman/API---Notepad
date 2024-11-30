@@ -2,7 +2,7 @@ import { model, Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
 
 export interface IUser extends Document {
-    profileImage?: string;
+    profileImage: string;
     name: string,
     lastName: string,
     username: string,
