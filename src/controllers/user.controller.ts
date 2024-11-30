@@ -15,29 +15,40 @@ function createToken(user: IUser) {
 }
 
 export const register = async (req: Request, res: Response): Promise<Response | any> => {
-    if (!req.body.email || !req.body.password || !req.body.username || !req.body.name || !req.body.lastName) {
-        return res.status(400).json({
-            msg: 'Debe rellenar todos los campos para registrarse satisfactoriamente'
-        })
+    const { name, lastName, username, email, password, profileImage } = req.body;
+
+    if (!name || !lastName || !username || !email || !password) {
+        return res.status(400).json({ msg: "Debe rellenar todos los campos para registrarse satisfactoriamente" });
     }
 
-    const findMail = await User.findOne({ email: req.body.email })
-    if (findMail) {
-        return res.status(400).json({
-            msg: "El correo electronico ya ha sido registrado"
-        })
-    }
-    const findUsername = await User.findOne({ username: req.body.username })
-    if (findUsername) {
-        return res.status(400).json({
-            msg: "El usuario ya ha sido registrado"
-        })
-    }
+    try {
+        // Verificar duplicados
+        if (await User.findOne({ email })) {
+            return res.status(400).json({ msg: "El correo electrónico ya ha sido registrado" });
+        }
 
-    const newUser = new User(req.body)
-    await newUser.save()
-    return res.status(201).json(newUser)
-}
+        if (await User.findOne({ username })) {
+            return res.status(400).json({ msg: "El nombre de usuario ya ha sido registrado" });
+        }
+
+        // Crear nuevo usuario
+        const newUser = new User({
+            name,
+            lastName,
+            username,
+            email,
+            password,
+            profileImage: profileImage || null, // Guardar la imagen si se proporciona
+        });
+
+        await newUser.save();
+
+        return res.status(201).json(newUser);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ msg: "Error al registrar el usuario" });
+    }
+};
 
 export const login = async (req: Request, res: Response): Promise<Response | any> => {
     const { loginValue, password } = req.body;
