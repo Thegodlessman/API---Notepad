@@ -22,45 +22,33 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage: storage as unknown as multer.StorageEngine });
 
-// Endpoint para subir imágenes
-router.post('/upload', upload.single('image'), async (req, res) => {
+// En el backend (Express)
+router.post('/upload', upload.single('image'), async (req, res): Promise<Response | any> => {
     try {
-        const imageUrl = req.file?.path; // URL pública de la imagen
-        if (!imageUrl) {
-            throw new Error('No se pudo obtener la URL de la imagen');
-        }
+        const userId = req.body.userId; // El ID del usuario debe venir en el body o el token
+        const imageUrl = req.file?.path; // La URL de la imagen subida a Cloudinary
 
-        res.json({ url: imageUrl }); // Respuesta con la URL de la imagen
-    } catch (error) {
-        console.error('Error en /upload:', error); // Registro del error detallado
-        res.status(500).json({ message: 'Error al subir la imagen', error: error });
-    }
-});
-
-// Endpoint para actualizar la imagen de perfil del usuario
-router.put('/users/:userId/profile-image', upload.single('image'), async (req, res): Promise<Response | any> => {
-    const { userId } = req.params;
-
-    try {
-        const imageUrl = req.file?.path; // URL de la imagen subida
         if (!imageUrl) {
             return res.status(400).json({ message: 'No se pudo obtener la URL de la imagen' });
         }
 
-        // Buscar al usuario y actualizar su imagen de perfil
+        // Buscar el usuario por su ID
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        user.profileImage = imageUrl; // Actualizar el campo de imagen de perfil
-        await user.save();
+        // Actualizar el campo 'profileImage' con la URL de la imagen
+        user.profileImage = imageUrl;
+        await user.save(); // Guardar el usuario actualizado en MongoDB
 
+        // Enviar la respuesta con la URL de la imagen
         res.status(200).json({ message: 'Imagen de perfil actualizada correctamente', profileImage: imageUrl });
     } catch (error) {
-        console.error('Error al actualizar la imagen de perfil:', error);
-        res.status(500).json({ message: 'Error al actualizar la imagen de perfil', error: error });
+        console.error('Error en /upload:', error);
+        res.status(500).json({ message: 'Error al subir la imagen', error });
     }
 });
+
 
 export default router;
