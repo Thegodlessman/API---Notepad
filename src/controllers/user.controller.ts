@@ -28,10 +28,10 @@ const storage = new CloudinaryStorage({
 });
 
 export const register = async (req: Request, res: Response): Promise<Response | any> => {
-    const { name, lastName, username, email, password, profileImage } = req.body;
+    const { name, lastname, username, email, password, profileImage } = req.body;
     const imageUrl = req.file?.path;
 
-    if (!name || !lastName || !username || !email || !password) {
+    if (!name || !lastname || !username || !email || !password) {
         return res.status(400).json({ msg: "Debe rellenar todos los campos para registrarse satisfactoriamente" });
     }
 
@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<Response | 
         // Crear nuevo usuario
         const newUser = new User({
             name,
-            lastName,
+            lastname,
             username,
             email,
             password,
