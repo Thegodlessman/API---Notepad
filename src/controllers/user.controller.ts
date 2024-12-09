@@ -4,8 +4,6 @@ import jwt from 'jsonwebtoken'
 
 import config from "../config/config"
 
-const router = express.Router();
-
 function createToken(user: IUser) {
     return jwt.sign({
         profileImage: user.profileImage,
