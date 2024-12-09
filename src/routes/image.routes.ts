@@ -1,51 +1,50 @@
 import express from 'express';
 import multer from 'multer';
-import { Request } from 'express';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import cloudinary from '../config/cloudinary';
-import User from '../models/user'; // Importar modelo de usuario
+import User from '../models/user';
 
 const router = express.Router();
 
 // Configuración de almacenamiento en Cloudinary
 const storage = new CloudinaryStorage({
     cloudinary,
-    params: async (req, file) => {
-        console.log('Archivo recibido:', file); // Depura el archivo recibido
-        return {
-            folder: 'images',
-            format: 'png', // Cambia el formato si es necesario
-            resource_type: 'image',
-        };
-    },
+    params: async () => ({
+        folder: 'images',
+        format: 'png', // Cambia el formato si es necesario
+        resource_type: 'image',
+    }),
 });
 
 const upload = multer({ storage: storage as unknown as multer.StorageEngine });
 
-// En el backend (Express)
-router.post('/upload', upload.single('image'), async (req, res): Promise<Response | any> => {
+// Endpoint de registro con imagen de perfil
+router.post('/register', upload.single('profileImage'), async (req, res): Promise<Response | any> => {
     try {
-        const userId = req.body.userId;  // Recibimos el userId desde el body
+        const { name, lastName, username, email, password } = req.body;
         const imageUrl = req.file?.path;
 
-        if (!imageUrl) {
-            return res.status(400).json({ message: 'No se pudo obtener la URL de la imagen' });
+        // Validar campos obligatorios
+        if (!name || !lastName || !username || !email || !password) {
+            return res.status(400).json({ message: 'Todos los campos son requeridos' });
         }
 
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
+        // Crear usuario
+        const newUser = new User({
+            name,
+            lastName,
+            username,
+            email,
+            password,
+            profileImage: imageUrl || null, // Guardar la URL de la imagen si existe
+        });
 
-        user.profileImage = imageUrl;
-        await user.save();
-
-        res.status(200).json({ message: 'Imagen de perfil actualizada correctamente', profileImage: imageUrl });
+        await newUser.save();
+        res.status(201).json({ message: 'Usuario registrado con éxito', user: newUser });
     } catch (error) {
-        console.error('Error en /upload:', error);
-        res.status(500).json({ message: 'Error al subir la imagen', error });
+        console.error('Error al registrar usuario:', error);
+        res.status(500).json({ message: 'Error al registrar usuario', error });
     }
 });
-
 
 export default router;

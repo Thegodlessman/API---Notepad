@@ -1,5 +1,8 @@
 import { Request, Response } from "express"
 import User, { IUser } from '../models/user'
+import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from '../config/cloudinary';
 import jwt from 'jsonwebtoken'
 
 import config from "../config/config"
@@ -15,8 +18,18 @@ function createToken(user: IUser) {
     }, config.JWTSecret)
 }
 
+const storage = new CloudinaryStorage({
+    cloudinary,
+    params: async () => ({
+        folder: 'images',
+        format: 'png', // Cambia el formato si es necesario
+        resource_type: 'image',
+    }),
+});
+
 export const register = async (req: Request, res: Response): Promise<Response | any> => {
     const { name, lastName, username, email, password, profileImage } = req.body;
+    const imageUrl = req.file?.path;
 
     if (!name || !lastName || !username || !email || !password) {
         return res.status(400).json({ msg: "Debe rellenar todos los campos para registrarse satisfactoriamente" });
@@ -39,7 +52,7 @@ export const register = async (req: Request, res: Response): Promise<Response | 
             username,
             email,
             password,
-            profileImage: profileImage || null, // Guardar la imagen si se proporciona
+            profileImage: imageUrl || null, // Guardar la URL de la imagen si existe
         });
 
         await newUser.save();
