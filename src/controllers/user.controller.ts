@@ -1,12 +1,10 @@
-import { Request, Response } from "express"
+import express, { Request, Response } from 'express';
 import User, { IUser } from '../models/user'
-import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import cloudinary from '../config/cloudinary';
 import jwt from 'jsonwebtoken'
 
 import config from "../config/config"
-import { body } from "express-validator"
+
+const router = express.Router();
 
 function createToken(user: IUser) {
     return jwt.sign({
@@ -18,45 +16,39 @@ function createToken(user: IUser) {
     }, config.JWTSecret)
 }
 
-const storage = new CloudinaryStorage({
-    cloudinary,
-    params: async () => ({
-        folder: 'images',
-        format: 'png', // Cambia el formato si es necesario
-        resource_type: 'image',
-    }),
-});
-
 export const register = async (req: Request, res: Response): Promise<Response | any> => {
-    const { name, lastName, username, email, password, profileImage } = req.body;
-    const imageUrl = req.file?.path;
+    const { name, lastName, username, email, password } = req.body;
+    const profileImage = req.file?.path; // URL de la imagen subida
+
+    if (!name || !lastName || !username || !email || !password) {
+        return res.status(400).json({ msg: 'Debe completar todos los campos.' });
+    }
 
     try {
-        // Verificar duplicados
+        // Validaciones de duplicados
         if (await User.findOne({ email })) {
-            return res.status(400).json({ msg: "El correo electrónico ya ha sido registrado" });
+            return res.status(400).json({ msg: 'El correo ya está registrado.' });
         }
 
         if (await User.findOne({ username })) {
-            return res.status(400).json({ msg: "El nombre de usuario ya ha sido registrado" });
+            return res.status(400).json({ msg: 'El nombre de usuario ya está registrado.' });
         }
 
-        // Crear nuevo usuario
+        // Crear el usuario
         const newUser = new User({
             name,
             lastName,
             username,
             email,
             password,
-            profileImage: imageUrl || null, // Guardar la URL de la imagen si existe
+            profileImage, // Guardar la URL de la imagen en el usuario
         });
 
         await newUser.save();
-
         return res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ msg: "Error al registrar el usuario" });
+        return res.status(500).json({ msg: 'Error al registrar el usuario.' });
     }
 };
 
