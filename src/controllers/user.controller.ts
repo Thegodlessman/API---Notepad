@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import User, { IUser } from '../models/user'
 import jwt from 'jsonwebtoken'
+import { upload } from '../middlewares/multer.middleware';
 
 import config from "../config/config"
 
@@ -16,37 +17,32 @@ function createToken(user: IUser) {
 
 export const register = async (req: Request, res: Response): Promise<Response | any> => {
     const { name, lastName, username, email, password } = req.body;
-    const profileImage = req.file?.path; // URL de la imagen subida
+    const profileImage = req.file?.path; // URL generada por Cloudinary
 
     if (!name || !lastName || !username || !email || !password) {
         return res.status(400).json({ msg: 'Debe completar todos los campos.' });
     }
 
     try {
-        // Validaciones de duplicados
-        if (await User.findOne({ email })) {
-            return res.status(400).json({ msg: 'El correo ya está registrado.' });
+        if (await User.findOne({ email }) || await User.findOne({ username })) {
+            return res.status(400).json({ msg: 'El usuario o correo ya están registrados.' });
         }
 
-        if (await User.findOne({ username })) {
-            return res.status(400).json({ msg: 'El nombre de usuario ya está registrado.' });
-        }
-
-        // Crear el usuario
         const newUser = new User({
             name,
             lastName,
             username,
             email,
             password,
-            profileImage, // Guardar la URL de la imagen en el usuario
+            profileImage
         });
-
         await newUser.save();
-        return res.status(201).json(newUser);
+        const token = createToken(newUser);
+
+        return res.status(201).json({ token });
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ msg: 'Error al registrar el usuario.' });
+        console.error('Error en el registro:', error);
+        return res.status(500).json({ msg: 'Error al registrar usuario.' });
     }
 };
 
