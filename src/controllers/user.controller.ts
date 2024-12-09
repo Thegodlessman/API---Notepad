@@ -32,7 +32,7 @@ export const register = async (req: Request, res: Response): Promise<Response | 
     const imageUrl = req.file?.path;
 
     if (!name || !lastName || !username || !email || !password) {
-        console.log(name + lastName + username + email + password)
+        console.log(name + lastName + username + email + password) // comentario
         return res.status(400).json({ msg: "Debe rellenar todos los campos para registrarse satisfactoriamente" });
     }
 
