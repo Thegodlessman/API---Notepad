@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
 
-// Obtener usuarios excluyendo amigos y solicitudes pendientes
-export const getUsers = async (req: any, res: Response): Promise<Response | any> => {
+export const getUsers = async (req: Request, res: Response): Promise<Response | any> => {
     try {
-        const { userId } = req.user;
+        const { userId } = req.body; // Suponiendo que el `userId` se pasa en el cuerpo de la solicitud
+
+        if (!userId) {
+            return res.status(400).json({ message: 'User ID is required' });
+        }
 
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: 'User not found' });
@@ -15,11 +18,12 @@ export const getUsers = async (req: any, res: Response): Promise<Response | any>
             'name lastName username'
         );
 
-        res.status(200).json(users);
+        return res.status(200).json(users);
     } catch (error) {
-        res.status(500).json({ message: 'Error fetching users', error });
+        return res.status(500).json({ message: 'Error fetching users', error });
     }
 };
+
 
 // Enviar solicitud de amistad
 export const sendFriendRequest = async (req: any, res: Response): Promise<Response | any> => {
