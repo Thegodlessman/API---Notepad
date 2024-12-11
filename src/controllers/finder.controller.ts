@@ -26,32 +26,37 @@ export const getUsers = async (req: Request, res: Response): Promise<Response | 
 
 
 // Enviar solicitud de amistad
-export const sendFriendRequest = async (req: any, res: Response): Promise<Response | any> => {
+export const sendFriendRequest = async (req: Request, res: Response): Promise<Response | any> => {
     try {
-        const { userId } = req.user;
-        const { targetUserId } = req.body;
+        const { targetUserId, userId } = req.body;
 
-        if (userId === targetUserId) {
-            return res.status(400).json({ message: 'Cannot send a request to yourself' });
+        if (!targetUserId || !userId) {
+            return res.status(400).json({ message: 'Faltan datos requeridos' });
         }
 
-        const user = await User.findById(userId);
+        // Verifica si el usuario destino existe
         const targetUser = await User.findById(targetUserId);
-
-        if (!user || !targetUser) {
-            return res.status(404).json({ message: 'User not found' });
+        if (!targetUser) {
+            return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        if (targetUser.friendRequests.includes(userId) || targetUser.friends.includes(userId)) {
-            return res.status(400).json({ message: 'Request already sent or user already a friend' });
+        // Verifica si ya existe una solicitud de amistad o son amigos
+        if (targetUser.friends.includes(userId)) {
+            return res.status(400).json({ message: 'Ya son amigos' });
         }
 
+        if (targetUser.friendRequests.includes(userId)) {
+            return res.status(400).json({ message: 'Solicitud ya enviada' });
+        }
+
+        // Agrega la solicitud de amistad al usuario destino
         targetUser.friendRequests.push(userId);
         await targetUser.save();
 
-        res.status(200).json({ message: 'Friend request sent successfully' });
+        return res.status(200).json({ message: 'Solicitud de amistad enviada' });
     } catch (error) {
-        res.status(500).json({ message: 'Error sending friend request', error });
+        console.error('Error en sendFriendRequest:', error);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
 };
 
