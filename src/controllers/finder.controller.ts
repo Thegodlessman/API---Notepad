@@ -15,7 +15,7 @@ export const getUsers = async (req: Request, res: Response): Promise<Response | 
         const excludedIds = [...user.friends, ...user.friendRequests, userId];
 
         const users = await User.find({ _id: { $nin: excludedIds } }).select(
-            'name lastName username'
+            'name lastName username profileImage'
         );
 
         return res.status(200).json(users);
