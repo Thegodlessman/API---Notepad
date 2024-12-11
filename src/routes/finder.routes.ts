@@ -8,7 +8,7 @@ import {
 const router = express.Router();
 
 // Rutas de usuarios
-router.get('/users', getUsers);
+router.post('/users', getUsers);
 
 // Rutas de solicitudes de amistad
 router.post('/friend-request/send', sendFriendRequest);
