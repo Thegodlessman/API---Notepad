@@ -1,4 +1,4 @@
-import { model, Schema, Document } from 'mongoose'
+import mongoose, { model, Schema, Document } from 'mongoose'
 import bcrypt from 'bcrypt'
 
 export interface IUser extends Document {
@@ -8,6 +8,8 @@ export interface IUser extends Document {
     username: string,
     email: string;
     password: string;
+    friends: string[]; // Lista de IDs de amigos
+    friendRequests: string[]; // Lista de IDs de solicitudes recibidas
     comparePassword: (arg: string) => Promise<boolean>
 }
 
@@ -39,7 +41,9 @@ const userSchema = new Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    friendRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 userSchema.pre<IUser>('save', async function (next) {

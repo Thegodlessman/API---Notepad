@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.routes';
 import specialRoutes from './routes/special.routes';
 import movieRoutes from './routes/movie.routes';
 import imageRoute from './routes/image.routes'
+import finderRoutes from './routes/finder.routes'
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -51,5 +52,6 @@ app.use(authRoutes);
 app.use(specialRoutes);
 app.use(movieRoutes);
 app.use(imageRoute);
+app.use(finderRoutes);
 
 export default app;
