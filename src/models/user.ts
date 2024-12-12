@@ -8,8 +8,8 @@ export interface IUser extends Document {
     username: string,
     email: string;
     password: string;
-    friends: string[]; // Lista de IDs de amigos
-    friendRequests: string[]; // Lista de IDs de solicitudes recibidas
+    friends: string[];
+    friendRequests: string[];
     comparePassword: (arg: string) => Promise<boolean>
 }
 

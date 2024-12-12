@@ -1,10 +1,10 @@
 import express from "express";
-import { getOrCreateChat, sendMessage, getChatMessages } from "../controllers/chat.controller";
+import { getFriends, getMessages } from "../controllers/chat.controller";
 
 const router = express.Router();
 
-router.post("/chat", getOrCreateChat);
-router.post("/chat/message", sendMessage);
-router.get("/chat/:chatId/messages", getChatMessages);
+router.get("/:userId", getFriends);
+
+router.get("/:userId/:friendId", getMessages);
 
 export default router;

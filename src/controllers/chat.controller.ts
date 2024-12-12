@@ -1,61 +1,36 @@
 import { Request, Response } from "express";
-import Chat from "../models/chat";
+import User from "../models/user";
+import { Message } from "../models/message";
 
-export const getOrCreateChat = async (req: Request, res: Response) => {
+// Obtener amigos de un usuario
+export const getFriends = async (req: Request, res: Response): Promise<Response | any> => {
+    const { userId } = req.params;
+
     try {
-        const { userId1, userId2 } = req.body;
+        const user = await User.findById(userId).populate("friends", "username profileImage");
+        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
-        let chat = await Chat.findOne({
-            participants: { $all: [userId1, userId2] },
-        });
-
-        if (!chat) {
-            chat = new Chat({ participants: [userId1, userId2], messages: [] });
-            await chat.save();
-        }
-
-        res.status(200).json(chat);
+        res.json(user.friends);
     } catch (error) {
-        res.status(500).json({ error: "Error retrieving or creating chat." });
+        console.error(error);
+        return res.status(500).json({ error: "Error obteniendo amigos" });
     }
 };
 
-export const sendMessage = async (req: Request, res: Response): Promise<Response | any> => {
+export const getMessages = async (req: Request, res: Response): Promise<Response | any> => {
+    const { userId, friendId } = req.params;
+
     try {
-        const { chatId, senderId, content, type } = req.body;
+        const messages = await Message.find({
+            $or: [
+                { sender: userId, receiver: friendId },
+                { sender: friendId, receiver: userId },
+            ],
+        }).sort({ timestamp: 1 });
 
-        const chat = await Chat.findById(chatId);
-        if (!chat) {
-            return res.status(404).json({ error: "Chat not found." });
-        }
-
-        const message = chat.messages.create({
-            senderId,
-            content,
-            type,
-            timestamp: new Date(),
-        });
-        chat.messages.push(message);
-
-        await chat.save();
-
-        res.status(200).json(message);
+        return res.json(messages);
     } catch (error) {
-        res.status(500).json({ error: "Error sending message." });
-    }
-};
-
-export const getChatMessages = async (req: Request, res: Response): Promise<Response | any> => {
-    try {
-        const { chatId } = req.params;
-
-        const chat = await Chat.findById(chatId);
-        if (!chat) {
-            return res.status(404).json({ error: "Chat not found." });
-        }
-
-        res.status(200).json(chat.messages);
-    } catch (error) {
-        res.status(500).json({ error: "Error retrieving messages." });
+        console.error(error);
+        return res.status(500).json({ error: "Error obteniendo mensajes" });
     }
 };
