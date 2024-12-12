@@ -20,7 +20,7 @@ export const getOrCreateChat = async (req: Request, res: Response) => {
     }
 };
 
-export const sendMessage = async (req: Request, res: Response) => {
+export const sendMessage = async (req: Request, res: Response): Promise<Response | any> => {
     try {
         const { chatId, senderId, content, type } = req.body;
 
@@ -45,7 +45,7 @@ export const sendMessage = async (req: Request, res: Response) => {
     }
 };
 
-export const getChatMessages = async (req: Request, res: Response) => {
+export const getChatMessages = async (req: Request, res: Response): Promise<Response | any> => {
     try {
         const { chatId } = req.params;
 

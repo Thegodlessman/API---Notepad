@@ -9,6 +9,7 @@ import specialRoutes from './routes/special.routes';
 import movieRoutes from './routes/movie.routes';
 import imageRoute from './routes/image.routes'
 import finderRoutes from './routes/finder.routes'
+import chatRoutes from './routes/chat.routes'
 
 import dotenv from 'dotenv';
 dotenv.config();
@@ -53,5 +54,6 @@ app.use(specialRoutes);
 app.use(movieRoutes);
 app.use(imageRoute);
 app.use(finderRoutes);
+app.use(chatRoutes);
 
 export default app;
