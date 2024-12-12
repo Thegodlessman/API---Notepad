@@ -7,7 +7,7 @@ export const getFriends = async (req: Request, res: Response): Promise<Response 
     const { userId } = req.body;
 
     try {
-        const user = await User.findById(userId).populate("friends", "username profileImage name lastname");
+        const user = await User.findById(userId).populate("friends", "username profileImage name lastName");
         if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
 
         res.json(user.friends);
