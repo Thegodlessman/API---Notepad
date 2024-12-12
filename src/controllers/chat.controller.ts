@@ -4,7 +4,7 @@ import { Message } from "../models/message";
 
 // Obtener amigos de un usuario
 export const getFriends = async (req: Request, res: Response): Promise<Response | any> => {
-    const { userId } = req.params;
+    const { userId } = req.body;
 
     try {
         const user = await User.findById(userId).populate("friends", "username profileImage");
