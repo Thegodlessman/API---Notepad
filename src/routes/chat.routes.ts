@@ -5,6 +5,6 @@ const router = express.Router();
 
 router.post("/friends", getFriends);
 
-router.get("/:userId/:friendId", getMessages);
+router.post("/:userId/:friendId", getMessages);
 
 export default router;

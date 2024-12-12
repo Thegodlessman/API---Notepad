@@ -18,7 +18,7 @@ export const getFriends = async (req: Request, res: Response): Promise<Response 
 };
 
 export const getMessages = async (req: Request, res: Response): Promise<Response | any> => {
-    const { userId, friendId } = req.params;
+    const { userId, friendId } = req.body;
 
     try {
         const messages = await Message.find({
